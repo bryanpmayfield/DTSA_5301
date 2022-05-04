@@ -1,0 +1,96 @@
+---
+title: "Week_3"
+author: "Bryan P. Mayfield"
+date: '2022-05-03'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+# A Bulleted List with Sub-Bullets Under at Least One Item
+
+-   Here is a bulleted list
+
+-   Item 2
+
+    -   Item 2A
+
+-   Item 3
+
+    -   Item 3A
+
+1.  Here is a numbered list
+2.  The next item in the list goes here
+3.  And then, if you want, another item
+
+*These words are italicized!*
+
+**These words are bold!**
+
+# This is a level one header
+
+## This is a level two header
+
+### And, just for fun, this is a level 3 header 
+
+```{r result_no_code, echo=FALSE}
+
+
+x <- 5
+
+y <- 6
+
+x * y
+
+x + y
+
+```
+
+Below is the table that was requested
+
+| Col1  | Col2    | Col3 | Col4  |
+|-------|---------|------|-------|
+| This  | is      | a    | table |
+| of    | text.   | It   | has   |
+| four  | columns | and  | four  |
+| rows. | Thank   | you  | !     |
+
+Below is the plot that was requested
+
+```{r plot}
+
+plot(cars$speed)
+```
+
+Below is the code chunk with session info
+
+```{r}
+
+
+sessionInfo()
+
+```
+
+Here is some more text
