@@ -93,7 +93,7 @@ One interesting analysis question might be is there a difference in the number o
 
 ```{r difference_by_boro}
 
-nypd_shooting_incident_data_clean %>%
+nypd_by_boro <- nypd_shooting_incident_data_clean %>%
   group_by(boro) %>%
   summarize(number_of_incidents = n())
 
@@ -153,6 +153,21 @@ nypd_shooting_incident_data_clean %>%
 nypd_shooting_incident_data_clean %>%
   ggplot(aes(x = vic_sex, fill = vic_race)) + 
   geom_bar()
+```
+
+```{r model_incidents_boro}
+
+lm(number_of_incidents ~ boro + 0, data = nypd_by_boro)
+
+
+
+```
+
+```{r model_multivariate}
+
+lm(boro ~ perp_race + vic_race, data = nypd_shooting_incident_data_clean)
+
+
 ```
 
 ## Conclusion 
