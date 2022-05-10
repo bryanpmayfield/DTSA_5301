@@ -1,6 +1,6 @@
 ---
 title: "NYPD Shooting Incident Data (Historic)"
-author: "Bryan P. Mayfield"
+author: "MSDS_student"
 date: '2022-05-03'
 output: html_document
 ---
@@ -61,7 +61,7 @@ nypd_shooting_incident_data_clean <- nypd_shooting_incident_data_clean %>%
   
 
 
-nypd_shooting_incident_data_clean
+
 
 ```
 
@@ -115,9 +115,19 @@ nypd_shooting_incident_data_clean %>%
 
 ```
 
-```{r}
+The above plot makes the point a bit clearer regarding the difference in incidents by neighborhood. Below are some additional interesting visualizations.
 
-# Bar chart looking at the race of the perpetrators (sp?)
+```{r percentage_murders}
+
+nypd_shooting_incident_data_clean %>%
+  ggplot(aes(x = statistical_murder_flag)) +
+  geom_bar()
+
+```
+
+```{r bar_plot_race}
+
+# Bar chart looking at the race of the perpetrators 
 
 nypd_shooting_incident_data_clean %>%
   mutate(perp_race = perp_race %>% fct_infreq() %>% fct_rev()) %>%
@@ -128,7 +138,7 @@ nypd_shooting_incident_data_clean %>%
 
 ```
 
-```{r}
+```{r bar_plot_age_group}
 
 
 nypd_shooting_incident_data_clean %>%
@@ -138,10 +148,13 @@ nypd_shooting_incident_data_clean %>%
 
 ```
 
-```{r}
+```{r bar_plot_sex_race}
 
 nypd_shooting_incident_data_clean %>%
   ggplot(aes(x = vic_sex, fill = vic_race)) + 
   geom_bar()
-
 ```
+
+## Conclusion 
+
+This brief EDA showed some interesting differences in the number of incident occurrences among different neighborhoods, age groups, and races. Further exploration of this data set and more sophisticated analysis would likely lead to some explanations for these differences. In terms of bias, it is possible that there may be some reporting bias since we aren't completely sure how this data was collected as well as the goals or objectives of those performing or directing the data collection. Additionally, the large amount of NA rows that had to be removed might have shifted the results some. In terms of personal bias, my own age group, race, and experiences with neighborhoods in New York City may have impacted the questions I asked of the data. In order to mitigate that, I tried to make the most objective observations possible without weighting the data in any particular direction and I remained aware of my own biases throughout the course of the analysis so that I could constantly question if that bias might be having any impact on the objectiveness of the analysis.
