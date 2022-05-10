@@ -33,7 +33,9 @@ nypd_shooting_incident_data
 
 ```
 
-```{r}
+This is historical data containing information regarding individual shooting incidents that occurred from 2006 to the end of the previous calendar year.
+
+```{r summary_of_data}
 
 summary(nypd_shooting_incident_data)
 
@@ -43,22 +45,64 @@ summary(nypd_shooting_incident_data)
 
 
 nypd_shooting_incident_data_clean <-nypd_shooting_incident_data %>%
-  clean_names() %>%
-  mutate(occur_date = mdy(occur_date)) 
-
+  clean_names() 
 
 nypd_shooting_incident_data_clean
+
+nypd_shooting_incident_data_clean %>%
+  mutate(occur_date = mdy(occur_date)) %>%
+  mutate(boro = as_factor(boro)) %>%
+  mutate(perp_sex = as_factor(perp_sex)) %>%
+  mutate(perp_age_group = as_factor(perp_age_group)) %>%
+  mutate(vic_age_group = as_factor(vic_age_group)) %>%
+  mutate(vic_sex = as_factor(vic_sex)) %>%
+  mutate(perp_race = as_factor(perp_race)) %>%
+  mutate(vic_race = as_factor(vic_race))
+  
+
+
+
 ```
 
-## 
+Above I have converted the class of multiple variables to date objects or factors depending on the variable. Although, the location date could be interesting and result in some interesting data visualizations, it is out of the scope of this project so I have dropped these columns from the dataset.
+
+Although the summary function provided some useful information, it still is not super clear where we have missing values. Next I will check each column for missing values.
+
+```{r missing_values}
+
+
+# Use sum(is.na) to check for and count the number of missing values in each column
+
+
+
+```
 
 ```{r}
 
+# Bar chart looking at the race of the perpetrators (sp?)
 
 nypd_shooting_incident_data_clean %>%
   ggplot(aes(x = perp_race)) + 
   geom_bar() + 
   coord_flip()
 
+
+```
+
+```{r}
+
+
+nypd_shooting_incident_data_clean %>%
+  ggplot(aes(x = vic_age_group)) + 
+  geom_bar()
+
+
+```
+
+```{r}
+
+nypd_shooting_incident_data_clean %>%
+  ggplot(aes(x = vic_sex, fill = vic_race)) + 
+  geom_bar()
 
 ```
