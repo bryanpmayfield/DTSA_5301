@@ -47,33 +47,71 @@ summary(nypd_shooting_incident_data)
 nypd_shooting_incident_data_clean <-nypd_shooting_incident_data %>%
   clean_names() 
 
-nypd_shooting_incident_data_clean
-
-nypd_shooting_incident_data_clean %>%
+nypd_shooting_incident_data_clean <- nypd_shooting_incident_data_clean %>%
   mutate(occur_date = mdy(occur_date)) %>%
   mutate(boro = as_factor(boro)) %>%
   mutate(perp_sex = as_factor(perp_sex)) %>%
   mutate(perp_age_group = as_factor(perp_age_group)) %>%
+  mutate(perp_age_group = fct_relevel(perp_age_group, "<18", "18-24", "25-44", "45-64", "65+", "UNKNOWN")) %>%
   mutate(vic_age_group = as_factor(vic_age_group)) %>%
   mutate(vic_sex = as_factor(vic_sex)) %>%
   mutate(perp_race = as_factor(perp_race)) %>%
-  mutate(vic_race = as_factor(vic_race))
+  mutate(vic_race = as_factor(vic_race)) %>%
+  select(-c(incident_key, jurisdiction_code, location_desc, x_coord_cd, y_coord_cd, latitude, longitude, lon_lat))
   
+
+
+nypd_shooting_incident_data_clean
+
+```
+
+Above I have converted the class of multiple variables to date objects or factors depending on the variable. Although, the location data could be interesting and result in some interesting insights and data visualizations, it is out of the scope of this particular project/analysis so I have dropped these columns from the data set.
+
+Although the summary function provided some useful information, it still is not super clear where we have missing values. Next I will check relevant columns for missing values (for this analysis, I am not particularly concerned with missing values for `occur date` or `occur_time)`.
+
+```{r identify_missing_values}
+
+
+# Use sum(is.na) to check for and count the number of missing values in each column
+
+is.na(nypd_shooting_incident_data_clean) %>%
+  colSums() 
+
+
+```
+
+From this analysis step to identify missing values, it looks like we are missing values in 3 columns, `perp_age_group`, `perp_sex`, and `perp_race`. Given unlimited time, I could likely identify some more elegant ways to deal with these missing values, but for the purpose of this simple analysis, it will be sufficient to just drop them.
+
+```{r remove_NA_values}
+
+nypd_shooting_incident_data_clean <- nypd_shooting_incident_data_clean %>%
+  drop_na()
+
+```
+
+One interesting analysis question might be is there a difference in the number of incidents by neighborhood.
+
+```{r difference_by_boro}
+
+nypd_shooting_incident_data_clean %>%
+  group_by(boro) %>%
+  summarize(number_of_incidents = n())
+
 
 
 
 ```
 
-Above I have converted the class of multiple variables to date objects or factors depending on the variable. Although, the location date could be interesting and result in some interesting data visualizations, it is out of the scope of this project so I have dropped these columns from the dataset.
+This numerical data is interesting and it shows that certain neighborhoods do seem to have more incidents than others. It may be easier to see the relationship if it is a visualization.
 
-Although the summary function provided some useful information, it still is not super clear where we have missing values. Next I will check each column for missing values.
-
-```{r missing_values}
+```{r bar_plot_by_boro}
 
 
-# Use sum(is.na) to check for and count the number of missing values in each column
-
-
+nypd_shooting_incident_data_clean %>%
+  group_by(boro) %>%
+  summarize(number_of_incidents = n()) %>%
+  ggplot(aes(x = fct_reorder(boro, number_of_incidents), y = number_of_incidents)) + 
+  geom_col()
 
 ```
 
@@ -82,6 +120,7 @@ Although the summary function provided some useful information, it still is not 
 # Bar chart looking at the race of the perpetrators (sp?)
 
 nypd_shooting_incident_data_clean %>%
+  mutate(perp_race = perp_race %>% fct_infreq() %>% fct_rev()) %>%
   ggplot(aes(x = perp_race)) + 
   geom_bar() + 
   coord_flip()
@@ -93,7 +132,7 @@ nypd_shooting_incident_data_clean %>%
 
 
 nypd_shooting_incident_data_clean %>%
-  ggplot(aes(x = vic_age_group)) + 
+  ggplot(aes(x = perp_age_group)) + 
   geom_bar()
 
 
