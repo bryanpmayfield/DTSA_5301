@@ -31,6 +31,8 @@ lookup_table <- read_csv("https://raw.githubusercontent.com/CSSEGISandData/COVID
 
 # Questions of Interest for this Analysis 
 
+The question of interest in this analysis is twofold, have some areas (states) handled the pandemic better than others as it relates to the number of cases and deaths? And two, what factors contribute to the number of deaths (measure as deaths per thousand)?
+
 # Data Source and Description 
 
 This data is from the [COVID-19 Data Repository by the Center for Systems Science and Engineering (CSSE) at Johns Hopkins University](https://github.com/CSSEGISandData/COVID-19). The upstream data sources are listed in the README of the Johns Hopkins repository. The data used in this analysis contains both case and deaths information for both the US individually as well as global data.
