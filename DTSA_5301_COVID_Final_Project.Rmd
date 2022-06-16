@@ -384,6 +384,18 @@ ggplot(aes(x = province_state, y = deaths)) +
 
 ```
 
+```{r}
+
+
+us_state_totals %>% 
+ggplot(aes(x = province_state, y = cases)) + 
+   geom_bar(stat = "identity") + 
+  theme(axis.text.x = element_text(angle = 90)) +
+  labs(title = "Number of COVID19 Cases by State")
+```
+
+The above bar charts somewhat confirm what we saw in the previous visualizations; that is, the number of deaths does seem to follow a similar trend as the number of cases, so, in general, states with the highest number of cases also had the highest number of deaths. Of course, we could do a more sophisticated analysis to explore this hypothesis further, but it is outside the scope of this project.
+
 # Modeling
 
 In the visualizations, I intentionally decided to keep 0 values, but this will lead to a problem, so here I will create a data set that filters those observations out for modeling purposes. Given more time, it might be prudent to further investigate observations with 0 values, especially those with 0 values for population (like Grand Princess, which showed a population of 0, but had 3 deaths).
