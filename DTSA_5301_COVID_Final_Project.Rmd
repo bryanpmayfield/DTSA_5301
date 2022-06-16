@@ -110,7 +110,9 @@ confirmed_us_clean <- confirmed_us %>%
                values_to = "cases") %>% 
   select(Admin2:cases) %>% 
   mutate(date = mdy(date)) %>% 
-  select(-c(Lat, Long_))
+  select(-c(Lat, Long_)) %>% 
+  rename(province_state = Province_State,
+         country_region = Country_Region)
 
 head(confirmed_us_clean)
 ```
@@ -169,4 +171,166 @@ global_combined_3 <- global_combined_2 %>%
   select(province_state, country_region, date, cases, deaths, Population, Combined_Key)
 
 head(global_combined_3)
+```
+
+# Analysis and Visualization 
+
+```{r}
+
+us_by_state <- us_combined %>% 
+  group_by(province_state, country_region, date) %>% 
+  summarize(cases = sum(cases),
+            deaths = sum(deaths),
+            Population = sum(Population)) %>%
+  mutate(deaths_per_million = deaths * 1000000 / Population) %>%
+  select(province_state, country_region, date, cases, deaths, deaths_per_million, Population) %>%
+  ungroup()
+
+head(us_by_state)
+```
+
+```{r}
+
+
+us_totals <-  us_by_state %>% 
+  group_by(country_region, date) %>% 
+  summarise(cases = sum(cases),
+            deaths = sum(deaths),
+            Population = sum(Population)) %>% 
+  mutate(deaths_per_million = deaths * 1000000 / Population) %>% 
+  select(country_region, date, cases, deaths, deaths_per_million, Population) %>% ungroup()
+
+head(us_totals)
+```
+
+```{r}
+
+tail(us_totals)
+```
+
+```{r}
+
+us_totals %>% 
+  ggplot(aes(x = date, y = cases)) + 
+  geom_line(aes(color = "cases")) + 
+  geom_point(aes(color = "cases")) + 
+  geom_line(aes(y = deaths, color = "deaths")) + 
+  geom_point(aes(y = deaths, color = "deaths")) + 
+  scale_y_log10() +
+  theme(legend.position = "bottom",
+        axis.text.x = element_text(angle = 90)) +
+  labs(title = "COVID19 in the United States", y = NULL)
+
+
+
+```
+
+```{r}
+
+state_1 = "Texas"
+
+state_2 = "Florida"
+
+us_by_state %>% 
+  filter(province_state == state_1) %>%
+  ggplot(aes(x = date, y = cases)) + 
+  geom_line(aes(color = "cases")) + 
+  geom_point(aes(color = "cases")) + 
+  geom_line(aes(y = deaths, color = "deaths")) + 
+  geom_point(aes(y = deaths, color = "deaths")) + 
+  scale_y_log10() +
+  theme(legend.position = "bottom",
+        axis.text.x = element_text(angle = 90)) +
+  labs(title = str_c("COVID19 in ", state_1), y = NULL)
+
+
+```
+
+```{r}
+
+us_by_state %>% 
+  filter(province_state == state_2) %>%
+  ggplot(aes(x = date, y = cases)) + 
+  geom_line(aes(color = "cases")) + 
+  geom_point(aes(color = "cases")) + 
+  geom_line(aes(y = deaths, color = "deaths")) + 
+  geom_point(aes(y = deaths, color = "deaths")) + 
+  scale_y_log10() +
+  theme(legend.position = "bottom",
+        axis.text.x = element_text(angle = 90)) +
+  labs(title = str_c("COVID19 in ", state_2), y = NULL)
+
+```
+
+```{r}
+
+max(us_totals$deaths)
+```
+
+```{r}
+
+us_by_state_2 <- us_by_state %>% 
+  mutate(new_cases = cases - lag(cases),
+         new_deaths = deaths - lag(deaths))
+
+
+```
+
+```{r}
+
+us_totals_2 <-  us_totals %>%
+  mutate(new_cases = cases - lag(cases),
+         new_deaths = deaths - lag(deaths))
+
+tail(us_totals_2 %>% select(new_cases, new_deaths, everything()))
+```
+
+It is surprising that the number of new deaths on June 12th, 2022 is negative. This may be some sort of error in the data collection?
+
+```{r}
+
+us_totals_2 %>% 
+  ggplot(aes(x= date, y = new_cases)) + 
+  geom_line(aes(color = "new_cases")) + 
+  geom_point(aes(color = "new_cases")) + 
+  geom_line(aes(y = new_deaths, color = "new_deaths")) + 
+  geom_point(aes(y = new_deaths, color = "new_deaths")) + 
+  scale_y_log10() +
+  theme(legend.position = "bottom",
+        axis.text.x = element_text(angle = 90)) + 
+  labs(title = "COVID 19 in the United States", y = NULL)
+```
+
+This visualization (above) seems to provide a bit more insight into the trajectory of cases. The spike in early 2022 may be related to the Omicron variant.
+
+```{r}
+
+us_by_state_2 %>% 
+  filter(province_state == state_1) %>%
+  ggplot(aes(x = date, y = new_cases)) + 
+  geom_line(aes(color = "new_cases")) + 
+  geom_point(aes(color = "new_cases")) + 
+  geom_line(aes(y = new_deaths, color = "new_deaths")) + 
+  geom_point(aes(y = new_deaths, color = "new_deaths")) + 
+  scale_y_log10() +
+  theme(legend.position = "bottom",
+        axis.text.x = element_text(angle = 90)) +
+  labs(title = str_c("COVID19 in ", state_1), y = NULL)
+
+```
+
+```{r}
+
+us_by_state_2 %>% 
+  filter(province_state == state_2) %>%
+  ggplot(aes(x = date, y = new_cases)) + 
+  geom_line(aes(color = "new_cases")) + 
+  geom_point(aes(color = "new_cases")) + 
+  geom_line(aes(y = new_deaths, color = "new_deaths")) + 
+  geom_point(aes(y = new_deaths, color = "new_deaths")) + 
+  scale_y_log10() +
+  theme(legend.position = "bottom",
+        axis.text.x = element_text(angle = 90)) +
+  labs(title = str_c("COVID19 in ", state_2), y = NULL)
+
 ```
