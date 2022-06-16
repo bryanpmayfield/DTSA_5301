@@ -35,7 +35,7 @@ The question of interest in this analysis is twofold, have some areas (states) h
 
 # Data Source and Description 
 
-This data is from the [COVID-19 Data Repository by the Center for Systems Science and Engineering (CSSE) at Johns Hopkins University](https://github.com/CSSEGISandData/COVID-19). The upstream data sources are listed in the README of the Johns Hopkins repository. The data used in this analysis contains both case and deaths information for both the US individually as well as global data.
+This data is from the [COVID-19 Data Repository by the Center for Systems Science and Engineering (CSSE) at Johns Hopkins University](https://github.com/CSSEGISandData/COVID-19). The upstream data sources are listed in the README of the Johns Hopkins repository. The data used in this analysis contains both case and deaths information for both the US individually as well as global data. The data is current up to 06/14/2022.
 
 # Data Exploration and Cleaning
 
@@ -372,6 +372,16 @@ While it is interesting that Grand Princess has a population of 0, it should be 
 us_state_totals %>% 
   slice_max(deaths_per_thousand, n = 10) %>% 
   filter(population_ > 0)
+```
+
+```{r}
+
+us_state_totals %>% 
+ggplot(aes(x = province_state, y = deaths)) + 
+   geom_bar(stat = "identity") + 
+  theme(axis.text.x = element_text(angle = 90)) +
+  labs(title = "COVID19 Deaths by State")
+
 ```
 
 # Modeling
