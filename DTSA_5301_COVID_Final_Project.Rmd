@@ -1,0 +1,172 @@
+---
+title: "DTSA_5301_COVID_Final_Project"
+author: "Bryan P. Mayfield"
+date: '2022-06-15'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r loading packages, include=FALSE}
+
+library(tidyverse)
+library(lubridate)
+
+```
+
+```{r, reading in data, include=FALSE}
+
+confirmed_us <- read_csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_US.csv")
+
+confirmed_global <- read_csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv")
+
+deaths_us <- read_csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_US.csv")
+
+deaths_global <- read_csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv")
+
+lookup_table <- read_csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/UID_ISO_FIPS_LookUp_Table.csv")
+```
+
+# Questions of Interest for this Analysis 
+
+# Data Source and Description 
+
+This data is from the [COVID-19 Data Repository by the Center for Systems Science and Engineering (CSSE) at Johns Hopkins University](https://github.com/CSSEGISandData/COVID-19). The upstream data sources are listed in the README of the Johns Hopkins repository. The data used in this analysis contains both case and deaths information for both the US individually as well as global data.
+
+# Data Exploration and Cleaning
+
+```{r}
+
+head(confirmed_us)
+```
+
+```{r}
+
+head(confirmed_global)
+```
+
+```{r}
+
+head(confirmed_us)
+```
+
+```{r}
+
+head(deaths_global)
+```
+
+```{r}
+
+head(deaths_us)
+```
+
+```{r}
+
+confirmed_global_clean <- confirmed_global %>% 
+  pivot_longer(cols = -c(`Province/State`, `Country/Region`, Lat, Long),
+               names_to = "date",
+               values_to = "cases") %>% 
+  select(-c(Lat, Long))
+
+head(confirmed_global_clean)
+```
+
+```{r}
+
+deaths_global_clean <- deaths_global %>% 
+  pivot_longer(cols = -c(`Province/State`, `Country/Region`, Lat, Long),
+               names_to = "date",
+               values_to = "deaths") %>% 
+  select(-c(Lat, Long))
+
+
+head(deaths_global_clean)
+```
+
+```{r}
+
+global_combined <- confirmed_global_clean %>% 
+  full_join(deaths_global_clean) %>% 
+  rename(country_region = `Country/Region`,
+         province_state = `Province/State`) %>% 
+  mutate(date = mdy(date))
+
+head(global_combined)
+```
+
+```{r}
+
+summary(global_combined)
+
+```
+
+```{r}
+
+confirmed_us_clean <- confirmed_us %>% 
+  pivot_longer(cols = -(UID:Combined_Key),
+               names_to = "date",
+               values_to = "cases") %>% 
+  select(Admin2:cases) %>% 
+  mutate(date = mdy(date)) %>% 
+  select(-c(Lat, Long_))
+
+head(confirmed_us_clean)
+```
+
+```{r}
+
+deaths_us_clean <- deaths_us %>% 
+  pivot_longer(cols = -(UID:Population),
+               names_to = "date",
+               values_to = "deaths") %>% 
+  select(Admin2:deaths) %>% 
+  mutate(date = mdy(date)) %>% 
+  select(-c(Lat, Long_)) %>% 
+  rename(province_state = Province_State,
+         country_region = Country_Region)
+
+head(deaths_us_clean)
+```
+
+```{r}
+
+us_combined <- confirmed_us_clean %>% 
+  full_join(deaths_us_clean)
+
+head(us_combined)
+```
+
+```{r}
+
+global_combined_2 <- global_combined %>% 
+  unite("Combined_Key",
+        c(province_state, country_region),
+        sep = ", ",
+        na.rm = TRUE,
+        remove = FALSE) 
+
+head(global_combined_2)
+```
+
+```{r}
+
+lookup_table_clean <- lookup_table %>% 
+  select(-c(Lat, Long_, Combined_Key, code3, iso2, iso3, Admin2)) %>% 
+  rename(province_state = Province_State,
+         country_region = Country_Region)
+
+head(lookup_table_clean)
+
+```
+
+```{r}
+
+global_combined_3 <- global_combined_2 %>% 
+  left_join(lookup_table_clean, by = c("province_state", "country_region")) %>% 
+  select(-c(UID, FIPS)) %>% 
+  select(province_state, country_region, date, cases, deaths, Population, Combined_Key)
+
+head(global_combined_3)
+```
