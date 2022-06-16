@@ -334,3 +334,24 @@ us_by_state_2 %>%
   labs(title = str_c("COVID19 in ", state_2), y = NULL)
 
 ```
+
+```{r}
+
+us_state_totals <- us_by_state_2 %>% 
+  group_by(province_state) %>% 
+  summarise(deaths = max(deaths), 
+            cases = max(cases),
+            population_ = max(Population),
+            cases_per_thousand = 1000 * cases / population_,
+            deaths_per_thousand = 1000 * deaths / population_)
+
+head(us_state_totals)
+```
+
+```{r}
+
+us_state_totals %>% 
+  slice_min(deaths_per_thousand, n = 10)
+```
+
+Although the above table is interesting, it doesn't address the fact that many places with a small number of deaths and/or cases are also places with much smaller populations. A better measure of how well places are doing would be to measure cases and deaths as a proportion of the overall population of that area (`province_state`) as opposed to cases or deaths per thousand.
