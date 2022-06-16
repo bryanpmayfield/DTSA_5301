@@ -7,8 +7,6 @@ output:
   html_document: default
 ---
 
-
-
 ```{r loading_packages}
 
 library(tidyverse)
@@ -153,21 +151,28 @@ nypd_shooting_incident_data_clean %>%
   geom_bar()
 ```
 
-
-
+# Modeling
 
 ```{r model_incidents_boro}
 
-lm(number_of_incidents ~ boro + 0, data = nypd_by_boro)
+model_1 <- lm(number_of_incidents ~ boro + 0, data = nypd_by_boro)
 
+summary(model_1)
 
+```
+
+```{r}
+
+nypd_modeling <- nypd_shooting_incident_data_clean %>% 
+  full_join(nypd_by_boro)
 
 ```
 
 ```{r model_multivariate}
 
-lm(boro ~ perp_race + vic_race, data = nypd_shooting_incident_data_clean)
+mvm <-  lm(number_of_incidents ~ perp_race + vic_race, data = nypd_modeling)
 
+summary(mvm)
 
 ```
 
