@@ -434,3 +434,11 @@ us_state_totals_modeling_w_second_preds %>%
 ```
 
 We don't really see much of an improvement here as expected from the model summary showing that `population_` is not a statistically significant contributor to the model. Given more time, we could explore the data set for more features that might explain the changes in \`deaths_per_thousand.
+
+# Conclusion and Possible Sources of Bias 
+
+In conclusion, in this analysis we were able to explore some of the differences in the number of COVID19 cases and death by both country and state. We took a deeper dive into differences between states and for my particular analysis I looked at two states in which I lived during the pandemic, Texas and Florida. We could see that some states handled the pandemic better than others in terms of number of cases and deaths normalized by population.
+
+However, it is important to note that there are possible sources of bias. For example, one possible source that has received media attention is the way in which deaths are reported. Some coroners in some areas may report and attribute a COVID19 death to something other than COVID19 such as pneumonia or upper respiratory illness or multi organ failure in an effort to decrease the visibility into the actual impact of COVID19 on that particular area.
+
+Another possible source of bias is in the number of cases variable. There are potentially many undiagnosed or asymptomatic cases that likely were not reported in any given area. It is unclear what the prevalence of this might have been so it would be quite difficult to eliminate this source of bias.
