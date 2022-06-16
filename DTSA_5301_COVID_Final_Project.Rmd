@@ -355,3 +355,82 @@ us_state_totals %>%
 ```
 
 Although the above table is interesting, it doesn't address the fact that many places with a small number of deaths and/or cases are also places with much smaller populations. A better measure of how well places are doing would be to measure cases and deaths as a proportion of the overall population of that area (`province_state`) as opposed to cases or deaths per thousand.
+
+```{r}
+
+us_state_totals %>% 
+  slice_max(deaths_per_thousand, n = 10)
+
+```
+
+While it is interesting that Grand Princess has a population of 0, it should be filtered out.
+
+```{r}
+
+us_state_totals %>% 
+  slice_max(deaths_per_thousand, n = 10) %>% 
+  filter(population_ > 0)
+```
+
+# Modeling
+
+In the visualizations, I intentionally decided to keep 0 values, but this will lead to a problem, so here I will create a data set that filters those observations out for modeling purposes. Given more time, it might be prudent to further investigate observations with 0 values, especially those with 0 values for population (like Grand Princess, which showed a population of 0, but had 3 deaths).
+
+```{r}
+
+us_state_totals_modeling <- us_state_totals %>% 
+  filter(population_ > 0)
+```
+
+```{r}
+
+lecture_model <- lm(deaths_per_thousand ~ cases_per_thousand, data = us_state_totals_modeling)
+
+summary(lecture_model)
+```
+
+```{r}
+
+us_state_totals_modeling_w_preds <- us_state_totals_modeling %>% 
+  mutate(pred = predict(lecture_model))
+
+head(us_state_totals_modeling_w_preds)
+```
+
+```{r}
+
+us_state_totals_modeling_w_preds %>% 
+  ggplot() +
+  geom_point(aes(x = cases_per_thousand, y = deaths_per_thousand), color = "blue") +
+  geom_point(aes(x = cases_per_thousand, y = pred), color = "red")
+
+```
+
+Let's see if we can improve this model by adding variables/features.
+
+```{r}
+
+second_model <- lm(deaths_per_thousand ~ population_ + cases_per_thousand, data = us_state_totals_modeling)
+
+summary(second_model)
+```
+
+```{r}
+
+us_state_totals_modeling_w_second_preds <- us_state_totals_modeling %>% 
+  mutate(pred_2 = predict(second_model))
+
+head(us_state_totals_modeling_w_second_preds)
+```
+
+```{r}
+
+us_state_totals_modeling_w_second_preds %>% 
+  ggplot() +
+  geom_point(aes(x = cases_per_thousand, y = deaths_per_thousand), color = "blue") +
+  geom_point(aes(x = cases_per_thousand, y = pred_2), color = "red")
+
+
+```
+
+We don't really see much of an improvement here as expected from the model summary showing that `population_` is not a statistically significant contributor to the model. Given more time, we could explore the data set for more features that might explain the changes in \`deaths_per_thousand.
